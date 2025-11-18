@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Body, Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl, field_validator
@@ -167,9 +167,8 @@ def delete_link(link_id: int, db: Session = Depends(get_db)):
 
 
 @app.post("/links/reorder", status_code=204, dependencies=[Depends(get_current_user)])
-def reorder_links(order_ids: List[int], db: Session = Depends(get_db)):
-    # order_ids is a list of link IDs in the desired order (1..n)
-    existing_ids = {l.id for l in db.execute(select(models.Link.id)).scalars().all()}
+def reorder_links(order_ids: List[int] = Body(...), db: Session = Depends(get_db)):
+    existing_ids = set(db.execute(select(models.Link.id)).scalars().all())
     if set(order_ids) != existing_ids:
         raise HTTPException(
             status_code=400,
