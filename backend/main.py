@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import httpx
+import logging
 
 import models
 from database import Base, engine, get_db
@@ -42,6 +43,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL")
+logger = logging.getLogger("biolinks")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -83,10 +85,12 @@ def notify_n8n(link_obj: models.Link, event: str) -> None:
         "ordem": link_obj.ordem,
     }
     try:
-        httpx.post(N8N_WEBHOOK_URL, json=payload, timeout=5)
-    except Exception:
+        resp = httpx.post(N8N_WEBHOOK_URL, json=payload, timeout=5)
+        if resp.status_code >= 400:
+            logger.warning("n8n webhook failed: %s %s", resp.status_code, resp.text)
+    except Exception as exc:
         # Evita quebrar o fluxo principal se o webhook falhar
-        pass
+        logger.warning("n8n webhook exception: %s", exc)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
