@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from fastapi import Body, Depends, FastAPI, HTTPException, status
+from fastapi import Body, Depends, FastAPI, HTTPException, status, BackgroundTasks
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, HttpUrl, field_validator
@@ -10,6 +10,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+import httpx
 
 import models
 from database import Base, engine, get_db
@@ -40,6 +41,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 
 ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
+N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -68,6 +70,23 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def notify_n8n(link_obj: models.Link, event: str) -> None:
+    if not N8N_WEBHOOK_URL:
+        return
+    payload = {
+        "event": event,
+        "id": link_obj.id,
+        "titulo": link_obj.titulo,
+        "url": link_obj.url,
+        "ordem": link_obj.ordem,
+    }
+    try:
+        httpx.post(N8N_WEBHOOK_URL, json=payload, timeout=5)
+    except Exception:
+        # Evita quebrar o fluxo principal se o webhook falhar
+        pass
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
@@ -129,7 +148,11 @@ def list_links(db: Session = Depends(get_db)):
 
 
 @app.post("/links", response_model=LinkRead, status_code=201, dependencies=[Depends(get_current_user)])
-def create_link(payload: LinkCreate, db: Session = Depends(get_db)):
+def create_link(
+    payload: LinkCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     data = payload.model_dump()
     data["url"] = str(payload.url)
     if data.get("ordem") is None:
@@ -139,11 +162,17 @@ def create_link(payload: LinkCreate, db: Session = Depends(get_db)):
     db.add(link)
     db.commit()
     db.refresh(link)
+    background_tasks.add_task(notify_n8n, link, "created")
     return link
 
 
 @app.put("/links/{link_id}", response_model=LinkRead, dependencies=[Depends(get_current_user)])
-def update_link(link_id: int, payload: LinkUpdate, db: Session = Depends(get_db)):
+def update_link(
+    link_id: int,
+    payload: LinkUpdate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     data = payload.model_dump()
     data["url"] = str(payload.url)
     link = db.get(models.Link, link_id)
@@ -153,14 +182,20 @@ def update_link(link_id: int, payload: LinkUpdate, db: Session = Depends(get_db)
         setattr(link, key, value)
     db.commit()
     db.refresh(link)
+    background_tasks.add_task(notify_n8n, link, "updated")
     return link
 
 
 @app.delete("/links/{link_id}", status_code=204, dependencies=[Depends(get_current_user)])
-def delete_link(link_id: int, db: Session = Depends(get_db)):
+def delete_link(
+    link_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     link = db.get(models.Link, link_id)
     if not link:
         raise HTTPException(status_code=404, detail="Link nao encontrado")
+    background_tasks.add_task(notify_n8n, link, "deleted")
     db.delete(link)
     db.commit()
     return None

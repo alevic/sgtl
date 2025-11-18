@@ -20,6 +20,7 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     environment:
       DATABASE_URL: postgresql+psycopg2://user:password@db:5432/biolinks_db
+      N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL}
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD: admin123
       SECRET_KEY: dev-secret-change-me

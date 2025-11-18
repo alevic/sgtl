@@ -22,6 +22,7 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       DATABASE_URL: postgresql+psycopg2://user:password@db:5432/biolinks_db
+      N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL}
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       SECRET_KEY: ${SECRET_KEY}
