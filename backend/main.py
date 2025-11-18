@@ -22,7 +22,7 @@ app = FastAPI(title="BioLinks API", version="0.1.0")
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://links.a2tec.com.br",
+    "https://biolinks.a2tec.com.br",
 ]
 
 app.add_middleware(
