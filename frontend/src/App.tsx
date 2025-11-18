@@ -286,7 +286,6 @@ function App() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
-                    placeholder="admin"
                   />
                 </div>
                 <div className="flex flex-col space-y-1">
@@ -301,7 +300,6 @@ function App() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
-                    placeholder="admin123"
                   />
                 </div>
                 <button
