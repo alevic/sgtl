@@ -5,6 +5,7 @@ type Link = {
   titulo: string;
   url: string;
   ordem: number;
+  descricao?: string | null;
 };
 
 const API_URL =
@@ -17,6 +18,7 @@ function App() {
   const [links, setLinks] = useState<Link[]>([]);
   const [titulo, setTitulo] = useState("");
   const [url, setUrl] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +26,7 @@ function App() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingTitulo, setEditingTitulo] = useState("");
   const [editingUrl, setEditingUrl] = useState("");
+  const [editingDescricao, setEditingDescricao] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<number | null>(null);
@@ -107,7 +110,7 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ titulo, url })
+        body: JSON.stringify({ titulo, url, descricao })
       });
       if (!res.ok) {
         const msg = await res.text();
@@ -119,6 +122,7 @@ function App() {
       );
       setTitulo("");
       setUrl("");
+      setDescricao("");
     } catch (err: any) {
       console.error(err);
       setError(err?.message || "Erro ao criar link. Verifique os dados.");
@@ -129,6 +133,7 @@ function App() {
     setEditingId(link.id);
     setEditingTitulo(link.titulo);
     setEditingUrl(link.url);
+    setEditingDescricao(link.descricao ?? "");
   };
 
   const handleUpdate = async (event: FormEvent<HTMLFormElement>) => {
@@ -152,7 +157,8 @@ function App() {
         body: JSON.stringify({
           titulo: editingTitulo,
           url: editingUrl,
-          ordem: currentOrder
+          ordem: currentOrder,
+          descricao: editingDescricao
         })
       });
       if (!res.ok) {
@@ -358,6 +364,25 @@ function App() {
               />
             </div>
 
+            <div className="flex flex-col space-y-1">
+              <label className="text-sm text-gray-300" htmlFor="descricao">
+                Descrição
+              </label>
+              <textarea
+                id="descricao"
+                name="descricao"
+                rows={3}
+                value={editingId ? editingDescricao : descricao}
+                onChange={(e) =>
+                  editingId
+                    ? setEditingDescricao(e.target.value)
+                    : setDescricao(e.target.value)
+                }
+                className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
+                placeholder="Detalhes, CTAs, hashtags..."
+              />
+            </div>
+
             <div className="flex space-x-2">
               <button
                 type="submit"
@@ -398,21 +423,28 @@ function App() {
                     e.dataTransfer.dropEffect = "move";
                   }}
                   onDrop={() => handleDrop(link.id)}
-                  className="flex items-center space-x-3 bg-gray-900/60 border border-gray-800 rounded-xl px-4 py-3 shadow cursor-grab"
+                  className="flex items-start space-x-3 bg-gray-900/60 border border-gray-800 rounded-xl px-4 py-3 shadow cursor-grab"
                 >
                   {!isPublicPage && isLoggedIn && (
-                    <span className="text-sm text-gray-400 w-6 text-center">
+                    <span className="text-sm text-gray-400 w-6 text-center pt-1">
                       {link.ordem}
                     </span>
                   )}
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-1 font-semibold text-white hover:text-indigo-400"
-                  >
-                    {link.titulo}
-                  </a>
+                  <div className="flex-1">
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold text-white hover:text-indigo-400"
+                    >
+                      {link.titulo}
+                    </a>
+                    {link.descricao && (
+                      <p className="text-sm text-gray-400 mt-1">
+                        {link.descricao}
+                      </p>
+                    )}
+                  </div>
                   {!isPublicPage && isLoggedIn && (
                     <div className="flex items-center space-x-2">
                       <button

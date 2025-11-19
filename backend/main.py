@@ -83,6 +83,7 @@ def notify_n8n(link_obj: models.Link, event: str) -> None:
         "titulo": link_obj.titulo,
         "url": link_obj.url,
         "ordem": link_obj.ordem,
+        "descricao": link_obj.descricao,
     }
     try:
         resp = httpx.post(N8N_WEBHOOK_URL, json=payload, timeout=5)
@@ -115,6 +116,7 @@ class LinkCreate(BaseModel):
     titulo: str
     url: HttpUrl
     ordem: Optional[int] = None
+    descricao: Optional[str] = None
 
     @field_validator("url", mode="before")
     @classmethod
@@ -140,6 +142,7 @@ class LinkRead(BaseModel):
     titulo: str
     url: HttpUrl
     ordem: int
+    descricao: Optional[str] = None
 
     class Config:
         from_attributes = True
