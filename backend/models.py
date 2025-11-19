@@ -11,3 +11,4 @@ class Link(Base):
     url = Column(String(2048), nullable=False)
     ordem = Column(Integer, nullable=False, default=0)
     descricao = Column(Text, nullable=True)
+    icone = Column(String(255), nullable=True)

@@ -6,6 +6,7 @@ type Link = {
   url: string;
   ordem: number;
   descricao?: string | null;
+  icone?: string | null;
 };
 
 const API_URL =
@@ -19,6 +20,8 @@ function App() {
   const [titulo, setTitulo] = useState("");
   const [url, setUrl] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [icone, setIcone] = useState("");
+  const [showIconPicker, setShowIconPicker] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +30,8 @@ function App() {
   const [editingTitulo, setEditingTitulo] = useState("");
   const [editingUrl, setEditingUrl] = useState("");
   const [editingDescricao, setEditingDescricao] = useState("");
+  const [editingIcone, setEditingIcone] = useState("");
+  const [showIconPickerEdit, setShowIconPickerEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<number | null>(null);
@@ -34,6 +39,24 @@ function App() {
   const isPublicPage =
     typeof window !== "undefined" && window.location.pathname.includes("public");
   const isLoggedIn = Boolean(token);
+
+  const ICON_PRESETS = ["🔗", "✨", "🔥", "🎧", "📸", "📞", "🛒", "💼", "📱", "💬", "🎥", "🎯"];
+
+  const closeIconPickers = () => {
+    setShowIconPicker(false);
+    setShowIconPickerEdit(false);
+  };
+
+  const handleIconSelect = (value: string, isEditing: boolean) => {
+    if (!value) return;
+    if (isEditing) {
+      setEditingIcone(value);
+      closeIconPickers();
+    } else {
+      setIcone(value);
+      closeIconPickers();
+    }
+  };
 
   useEffect(() => {
     const savedToken = localStorage.getItem("biolinks_token");
@@ -93,6 +116,7 @@ function App() {
     setToken(null);
     localStorage.removeItem("biolinks_token");
     setEditingId(null);
+    closeIconPickers();
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -110,7 +134,7 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ titulo, url, descricao })
+        body: JSON.stringify({ titulo, url, descricao, icone })
       });
       if (!res.ok) {
         const msg = await res.text();
@@ -123,6 +147,7 @@ function App() {
       setTitulo("");
       setUrl("");
       setDescricao("");
+      setIcone("");
     } catch (err: any) {
       console.error(err);
       setError(err?.message || "Erro ao criar link. Verifique os dados.");
@@ -134,6 +159,8 @@ function App() {
     setEditingTitulo(link.titulo);
     setEditingUrl(link.url);
     setEditingDescricao(link.descricao ?? "");
+    setEditingIcone(link.icone ?? "");
+    closeIconPickers();
   };
 
   const handleUpdate = async (event: FormEvent<HTMLFormElement>) => {
@@ -158,7 +185,8 @@ function App() {
           titulo: editingTitulo,
           url: editingUrl,
           ordem: currentOrder,
-          descricao: editingDescricao
+          descricao: editingDescricao,
+          icone: editingIcone
         })
       });
       if (!res.ok) {
@@ -172,6 +200,7 @@ function App() {
           .sort((a, b) => a.ordem - b.ordem)
       );
       setEditingId(null);
+      closeIconPickers();
     } catch (err: any) {
       console.error(err);
       setError(err?.message || "Erro ao atualizar link.");
@@ -196,6 +225,7 @@ function App() {
       setLinks((prev) => prev.filter((l) => l.id !== id));
       if (editingId === id) {
         setEditingId(null);
+        closeIconPickers();
       }
     } catch (err: any) {
       console.error(err);
@@ -365,6 +395,50 @@ function App() {
             </div>
 
             <div className="flex flex-col space-y-1">
+              <label className="text-sm text-gray-300" htmlFor="icone">
+                Ícone (emoji, classe ou URL)
+              </label>
+              <div className="flex items-center space-x-2">
+                <input
+                  id="icone"
+                  name="icone"
+                  type="text"
+                  value={editingId ? editingIcone : icone}
+                  onChange={(e) =>
+                    editingId ? setEditingIcone(e.target.value) : setIcone(e.target.value)
+                  }
+                  className="flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white focus:border-indigo-500 focus:outline-none"
+                  placeholder="🔗 ou fa-link ou https://imagem"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    editingId
+                      ? setShowIconPickerEdit((prev) => !prev)
+                      : setShowIconPicker((prev) => !prev)
+                  }
+                  className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white hover:border-indigo-500 transition"
+                >
+                  🙂
+                </button>
+              </div>
+              {(editingId ? showIconPickerEdit : showIconPicker) && (
+                <div className="mt-2 grid grid-cols-6 gap-2 rounded-lg border border-gray-700 bg-gray-900 p-3">
+                  {ICON_PRESETS.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      className="text-xl bg-gray-800 rounded-md p-2 hover:bg-indigo-600 transition"
+                      onClick={() => handleIconSelect(option, Boolean(editingId))}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col space-y-1">
               <label className="text-sm text-gray-300" htmlFor="descricao">
                 Descrição
               </label>
@@ -393,7 +467,10 @@ function App() {
               {editingId && (
                 <button
                   type="button"
-                  onClick={() => setEditingId(null)}
+                  onClick={() => {
+                    setEditingId(null);
+                    closeIconPickers();
+                  }}
                   className="w-full rounded-lg bg-gray-700 px-4 py-2 font-semibold text-white shadow hover:bg-gray-600 transition"
                 >
                   Cancelar
@@ -435,9 +512,14 @@ function App() {
                       href={link.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-semibold text-white hover:text-indigo-400"
+                      className="flex items-center gap-2 font-semibold text-white hover:text-indigo-400"
                     >
-                      {link.titulo}
+                      {link.icone && (
+                        <span className="text-xl" aria-hidden="true">
+                          {link.icone}
+                        </span>
+                      )}
+                      <span>{link.titulo}</span>
                     </a>
                     {link.descricao && (
                       <p className="text-sm text-gray-400 mt-1">
