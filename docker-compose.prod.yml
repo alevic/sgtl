@@ -20,7 +20,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
-    command: sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2"
+    command: sh -c "python migrate.py && uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2"
     environment:
       DATABASE_URL: postgresql+psycopg2://user:password@db:5432/biolinks_db
       N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL}
