@@ -1,9 +1,12 @@
 DEV_COMPOSE=docker compose --env-file .env -f docker-compose.dev.yml
 
-.PHONY: dev-up dev-down dev-logs dev-migrate dev-restart
+.PHONY: dev-up dev-up-nobuild dev-down dev-logs dev-migrate dev-restart
 
 dev-up:
 	$(DEV_COMPOSE) up -d --build backend frontend
+
+dev-up-nobuild:
+	$(DEV_COMPOSE) up -d backend frontend
 
 dev-down:
 	$(DEV_COMPOSE) down
