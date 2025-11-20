@@ -26,6 +26,7 @@ origins = [
     "https://www.jjeturismo.com.br",
     "https://sgtl.jjeturismo.com.br",
     "https://www.sgtl.jjeturismo.com.br",
+    "https://api-sgtl.jjeturismo.com.br",
 ]
 
 app.add_middleware(
