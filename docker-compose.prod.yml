@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile.prod
     command: sh -c "python migrate.py && uvicorn main:app --host 0.0.0.0 --port 8000 --workers 2"
     environment:
-      DATABASE_URL: postgresql+psycopg2://user:password@db:5432/sgtl_db
+      DATABASE_URL: ${DATABASE_URL}
       N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL}
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
