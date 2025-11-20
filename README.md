@@ -1,6 +1,6 @@
-# BioLinks
+# SGTL
 
-BioLinks é um mini-Linktree construído com FastAPI + PostgreSQL + React/Vite. O projeto foi evoluído via Codex com autenticação JWT, ordenação drag-and-drop, webhook com n8n e migrações automatizadas via Alembic.
+SGTL é um mini-Linktree construído com FastAPI + PostgreSQL + React/Vite. O projeto foi evoluído via Codex com autenticação JWT, ordenação drag-and-drop, webhook com n8n e migrações automatizadas via Alembic.
 
 ## Visão Geral
 
@@ -50,10 +50,10 @@ ADMIN_PASSWORD=admin123
 SECRET_KEY=...
 ACCESS_TOKEN_EXPIRE_MINUTES=120
 N8N_WEBHOOK_URL=
-DATABASE_URL=postgresql+psycopg2://user:password@db:5432/biolinks_db
+DATABASE_URL=postgresql+psycopg2://user:password@db:5432/sgtl_db
 POSTGRES_USER=user
 POSTGRES_PASSWORD=password
-POSTGRES_DB=biolinks_db
+POSTGRES_DB=sgtl_db
 VITE_API_URL=http://127.0.0.1:8000
 ```
 

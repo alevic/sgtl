@@ -37,7 +37,7 @@ function App() {
   const [draggingId, setDraggingId] = useState<number | null>(null);
 
   const isPublicPage =
-    typeof window !== "undefined" && window.location.pathname.includes("public");
+    typeof window !== "undefined" && window.location.pathname.includes("/links");
   const isLoggedIn = Boolean(token);
 
   const ICON_PRESETS = ["🔗", "✨", "🔥", "🎧", "📸", "📞", "🛒", "💼", "📱", "💬", "🎥", "🎯"];
@@ -59,7 +59,7 @@ function App() {
   };
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("biolinks_token");
+    const savedToken = localStorage.getItem("sgtl_token");
     if (savedToken) {
       setToken(savedToken);
     }
@@ -104,7 +104,7 @@ function App() {
       }
       const data = await res.json();
       setToken(data.access_token);
-      localStorage.setItem("biolinks_token", data.access_token);
+      localStorage.setItem("sgtl_token", data.access_token);
       setPassword("");
     } catch (err: any) {
       console.error(err);
@@ -114,7 +114,7 @@ function App() {
 
   const handleLogout = () => {
     setToken(null);
-    localStorage.removeItem("biolinks_token");
+    localStorage.removeItem("sgtl_token");
     setEditingId(null);
     closeIconPickers();
   };
@@ -284,7 +284,7 @@ function App() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-6">
         <header className="text-center">
-          <h1 className="text-3xl font-bold text-white">BioLinks</h1>
+          <h1 className="text-3xl font-bold text-white">SGTL</h1>
           <p className="text-sm text-gray-400">
             {isPublicPage ? "Página pública" : "Seu micro landing de links"}
           </p>

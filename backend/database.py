@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg2://user:password@db:5432/biolinks_db",
+    "postgresql+psycopg2://user:password@db:5432/sgtl_db",
 )
 
 # --- INÍCIO DA CORREÇÃO ---

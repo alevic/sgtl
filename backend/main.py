@@ -19,12 +19,15 @@ from database import Base, engine, get_db
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="BioLinks API", version="0.1.0")
+app = FastAPI(title="SGTL API", version="0.1.0")
 
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://biolinks.a2tec.com.br",
+    "https://jjeturismo.com.br",
+    "https://www.jjeturismo.com.br",
+    "https://sgtl.jjeturismo.com.br",
+    "https://www.sgtl.jjeturismo.com.br",
 ]
 
 app.add_middleware(
@@ -43,7 +46,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 ADMIN_USERNAME = os.environ["ADMIN_USERNAME"]
 ADMIN_PASSWORD = os.environ["ADMIN_PASSWORD"]
 N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL")
-logger = logging.getLogger("biolinks")
+logger = logging.getLogger("sgtl")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
