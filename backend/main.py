@@ -17,8 +17,6 @@ import models
 from database import Base, engine, get_db
 
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="SGTL API", version="0.1.0")
 
 origins = [
