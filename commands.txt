@@ -1,0 +1,14 @@
+Relembrando os comandos/URLs usando o daemon remoto em 192.168.0.113:
+
+Dev (rodando containers): make dev-up-remote — builda e sobe backend/ frontend no host remoto. 
+URLs: API http://192.168.0.113:8000 (Swagger em /docs), frontend http://192.168.0.113:5173.
+
+Dev (derrubar): docker --host tcp://192.168.0.113:2375 compose --env-file .env -f docker-compose.remote.yml down.
+
+Dev (rebuild rápido): docker --host tcp://192.168.0.113:2375 compose --env-file .env -f docker-compose.remote.yml build backend frontend.
+
+Preview “prod-like” do frontend: make frontend-preview-remote (no host remoto) roda npm run build e npm run preview expondo a 5173; abra http://192.168.0.113:5173 enquanto o preview estiver rodando.
+
+Build de imagens prod: docker --host tcp://192.168.0.113:2375 compose --env-file .env -f docker-compose.prod.yml build (não mapeia portas; usado para gerar imagens para deploy).
+
+Esses comandos já consideram que você está no WSL/Ubuntu com o binário Docker em ~/.local/bin/docker apontando para o host remoto.

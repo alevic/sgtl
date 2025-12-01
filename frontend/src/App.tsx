@@ -7,6 +7,7 @@ type Link = {
   ordem: number;
   descricao?: string | null;
   icone?: string | null;
+  publicado: boolean;
 };
 
 const API_URL =
@@ -21,6 +22,7 @@ function App() {
   const [url, setUrl] = useState("");
   const [descricao, setDescricao] = useState("");
   const [icone, setIcone] = useState("");
+  const [publicado, setPublicado] = useState(true);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState("");
@@ -31,6 +33,7 @@ function App() {
   const [editingUrl, setEditingUrl] = useState("");
   const [editingDescricao, setEditingDescricao] = useState("");
   const [editingIcone, setEditingIcone] = useState("");
+  const [editingPublicado, setEditingPublicado] = useState(true);
   const [showIconPickerEdit, setShowIconPickerEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +74,13 @@ function App() {
         setLoading(true);
         const res = await fetch(`${API_URL}/links`);
         const data = await res.json();
-        setLinks(data);
+        const normalized: Link[] = (data as any[]).map((l) => ({
+          ...l,
+          publicado: l?.publicado !== false
+        }));
+        setLinks(
+          isPublicPage ? normalized.filter((l) => l.publicado) : normalized
+        );
       } catch (err) {
         console.error(err);
         setError("Nao foi possivel carregar os links.");
@@ -134,7 +143,7 @@ function App() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ titulo, url, descricao, icone })
+        body: JSON.stringify({ titulo, url, descricao, icone, publicado })
       });
       if (!res.ok) {
         const msg = await res.text();
@@ -148,6 +157,7 @@ function App() {
       setUrl("");
       setDescricao("");
       setIcone("");
+      setPublicado(true);
     } catch (err: any) {
       console.error(err);
       setError(err?.message || "Erro ao criar link. Verifique os dados.");
@@ -160,6 +170,7 @@ function App() {
     setEditingUrl(link.url);
     setEditingDescricao(link.descricao ?? "");
     setEditingIcone(link.icone ?? "");
+    setEditingPublicado(link.publicado);
     closeIconPickers();
   };
 
@@ -186,7 +197,8 @@ function App() {
           url: editingUrl,
           ordem: currentOrder,
           descricao: editingDescricao,
-          icone: editingIcone
+          icone: editingIcone,
+          publicado: editingPublicado
         })
       });
       if (!res.ok) {
@@ -457,6 +469,20 @@ function App() {
               />
             </div>
 
+            <label className="inline-flex items-center space-x-2 text-sm text-gray-300">
+              <input
+                type="checkbox"
+                checked={editingId ? editingPublicado : publicado}
+                onChange={(e) =>
+                  editingId
+                    ? setEditingPublicado(e.target.checked)
+                    : setPublicado(e.target.checked)
+                }
+                className="h-4 w-4 rounded border-gray-700 bg-gray-800 text-indigo-500 focus:ring-indigo-500"
+              />
+              <span>{(editingId ? editingPublicado : publicado) ? "Publicado" : "Oculto"}</span>
+            </label>
+
             <div className="flex space-x-2">
               <button
                 type="submit"
@@ -525,6 +551,17 @@ function App() {
                       <p className="text-sm text-gray-400 mt-1">
                         {link.descricao}
                       </p>
+                    )}
+                    {!isPublicPage && isLoggedIn && (
+                      <span
+                        className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs ${
+                          link.publicado
+                            ? "bg-green-900/60 text-green-200"
+                            : "bg-yellow-900/60 text-yellow-200"
+                        }`}
+                      >
+                        {link.publicado ? "Publicado" : "Oculto"}
+                      </span>
                     )}
                   </div>
                   {!isPublicPage && isLoggedIn && (

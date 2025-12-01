@@ -121,6 +121,7 @@ class LinkCreate(BaseModel):
     ordem: Optional[int] = None
     descricao: Optional[str] = None
     icone: Optional[str] = None
+    publicado: bool = True
 
     @field_validator("url", mode="before")
     @classmethod
@@ -148,6 +149,7 @@ class LinkRead(BaseModel):
     ordem: int
     descricao: Optional[str] = None
     icone: Optional[str] = None
+    publicado: bool
 
     class Config:
         from_attributes = True

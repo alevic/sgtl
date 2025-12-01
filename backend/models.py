@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Boolean, Column, Integer, String, Text, text
 
 from database import Base
 
@@ -12,3 +12,9 @@ class Link(Base):
     ordem = Column(Integer, nullable=False, default=0)
     descricao = Column(Text, nullable=True)
     icone = Column(String(255), nullable=True)
+    publicado = Column(
+        Boolean,
+        nullable=False,
+        server_default=text("true"),
+        default=True,
+    )
