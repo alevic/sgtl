@@ -5,7 +5,7 @@ DOCKER_FLAGS ?= --host $(DOCKER_HOST)
 DEV_COMPOSE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.dev.yml
 DEV_COMPOSE_REMOTE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.remote.yml
 
-.PHONY: dev-up dev-up-nobuild dev-down dev-logs dev-migrate dev-restart
+.PHONY: dev-up dev-up-nobuild dev-up-remote dev-down dev-logs dev-migrate dev-restart frontend-preview-remote
 
 dev-up:
 	$(DEV_COMPOSE) up -d --build backend frontend
@@ -27,3 +27,7 @@ dev-migrate:
 
 dev-restart:
 	$(DEV_COMPOSE) restart backend frontend
+
+frontend-preview-remote:
+	$(DEV_COMPOSE_REMOTE) run --rm frontend sh -c "npm run build"
+	$(DEV_COMPOSE_REMOTE) run --rm --service-ports frontend npm run preview -- --host 0.0.0.0 --port 5173
