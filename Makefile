@@ -1,5 +1,5 @@
 DOCKER_HOST_DEV ?= tcp://192.168.0.113:2375
-DOCKER_HOST_PROD ?= tcp://a2tec.com.br:2375
+DOCKER_HOST_PROD ?= tcp://jjeturismo.com.br:2375
 DOCKER_HOST ?= $(DOCKER_HOST_DEV)
 DOCKER_BIN ?= $(shell if [ -x $$HOME/.local/bin/docker ]; then echo $$HOME/.local/bin/docker; elif command -v docker >/dev/null 2>&1; then echo docker; elif command -v docker.exe >/dev/null 2>&1; then echo docker.exe; else echo docker; fi)
 DOCKER_FLAGS ?= --host $(DOCKER_HOST)

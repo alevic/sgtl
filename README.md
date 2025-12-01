@@ -84,7 +84,7 @@ Instale o `make` no WSL via `sudo apt install make`.
 
 ## Docker remoto (build/exec na máquina Linux)
 
-- O Makefile já define `DOCKER_HOST_DEV=tcp://192.168.0.113:2375` e `DOCKER_HOST_PROD=tcp://a2tec.com.br:2375`; por padrão usa o DEV (`DOCKER_HOST=$(DOCKER_HOST_DEV)`).
+- O Makefile já define `DOCKER_HOST_DEV=tcp://192.168.0.113:2375` e `DOCKER_HOST_PROD=tcp://jjeturismo.com.br:2375`; por padrão usa o DEV (`DOCKER_HOST=$(DOCKER_HOST_DEV)`).
 - Para trocar o host em qualquer alvo, use `DOCKER_HOST=$(DOCKER_HOST_PROD) make prod-build` (ou outro alvo) ou passe um host custom: `make dev-up DOCKER_HOST=tcp://seu-host:2375`.
 - Se o `docker` nativo não estiver instalado no WSL, o Makefile usa `docker.exe` automaticamente; mantenha o Docker Desktop com acesso à rede habilitado.
 - Teste a conexão com `docker.exe -H tcp://192.168.0.113:2375 ps` (deve listar os containers remotos).
