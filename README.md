@@ -89,12 +89,13 @@ Instale o `make` no WSL via `sudo apt install make`.
 - Se o `docker` nativo não estiver instalado no WSL, o Makefile usa `docker.exe` automaticamente; mantenha o Docker Desktop com acesso à rede habilitado.
 - Teste a conexão com `docker.exe -H tcp://192.168.0.113:2375 ps` (deve listar os containers remotos).
 - Porta 2375 é sem TLS; mantenha a máquina na mesma rede confiável ou configure TLS/SSH se expor para fora.
-- Para evitar bind mounts inválidos no host remoto, use `make dev-up-remote` (combina `docker-compose.dev.yml` + `docker-compose.remote.yml`, sem volumes locais).
+- Para evitar bind mounts inválidos no host remoto, use `make dev-up-remote` (combina `docker-compose.dev.yml` + `docker-compose.a2tec.yml`, sem volumes locais).
 - Para validar o bundle do frontend em modo produção no host remoto: `make frontend-preview-remote` (faz `npm run build` e sobe `npm run preview` expondo a porta 5173).
 - Outros alvos úteis no host remoto:
   - `make dev-build-remote` (apenas build backend/frontend)
   - `make dev-down-remote` (derruba stack remota)
   - `make prod-build` (build das imagens do `docker-compose.prod.yml`)
+- O backend em produção roda `python migrate.py` antes do `uvicorn` (definido no `backend/Dockerfile.prod`), garantindo que redeploy pelo Coolify aplique as migrações automaticamente.
 - No Windows/WSL sem Docker Desktop: foi instalado o cliente Docker em `~/.local/bin/docker` + plugin Compose em `~/.docker/cli-plugins/docker-compose`. O Makefile prioriza esse binário com `DOCKER_HOST=tcp://192.168.0.113:2375`, então basta usar `make dev-up-remote`/`dev-down`/etc. sem precisar do Docker Desktop local.
 
 ## Webhook n8n

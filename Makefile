@@ -5,7 +5,7 @@ DOCKER_BIN ?= $(shell if [ -x $$HOME/.local/bin/docker ]; then echo $$HOME/.loca
 DOCKER_FLAGS ?= --host $(DOCKER_HOST)
 
 DEV_COMPOSE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.dev.yml
-DEV_COMPOSE_REMOTE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.remote.yml
+DEV_COMPOSE_REMOTE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.a2tec.yml
 PROD_COMPOSE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.prod.yml
 
 .PHONY: dev-up dev-up-nobuild dev-up-remote dev-down dev-down-remote dev-build-remote dev-logs dev-migrate dev-restart frontend-preview-remote prod-build
