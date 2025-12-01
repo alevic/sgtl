@@ -1,4 +1,9 @@
-DEV_COMPOSE=docker compose --env-file .env -f docker-compose.dev.yml
+DOCKER_HOST ?= tcp://192.168.0.113:2375
+DOCKER_BIN ?= $(shell if [ -x $$HOME/.local/bin/docker ]; then echo $$HOME/.local/bin/docker; elif command -v docker >/dev/null 2>&1; then echo docker; elif command -v docker.exe >/dev/null 2>&1; then echo docker.exe; else echo docker; fi)
+DOCKER_FLAGS ?= --host $(DOCKER_HOST)
+
+DEV_COMPOSE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.dev.yml
+DEV_COMPOSE_REMOTE=$(DOCKER_BIN) $(DOCKER_FLAGS) compose --env-file .env -f docker-compose.remote.yml
 
 .PHONY: dev-up dev-up-nobuild dev-down dev-logs dev-migrate dev-restart
 
@@ -7,6 +12,9 @@ dev-up:
 
 dev-up-nobuild:
 	$(DEV_COMPOSE) up -d backend frontend
+
+dev-up-remote:
+	$(DEV_COMPOSE_REMOTE) up -d --build backend frontend
 
 dev-down:
 	$(DEV_COMPOSE) down

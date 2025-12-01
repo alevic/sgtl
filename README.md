@@ -82,6 +82,16 @@ Para rodar manualmente: `docker compose --env-file .env -f docker-compose.dev.ym
 
 Instale o `make` no WSL via `sudo apt install make`.
 
+## Docker remoto (build/exec na máquina Linux)
+
+- O Makefile já define `DOCKER_HOST=tcp://192.168.0.113:2375`, então `make dev-up`/`dev-migrate` rodam contra o daemon remoto.
+- Para trocar o host, use `make dev-up DOCKER_HOST=tcp://seu-host:2375` ou exporte `DOCKER_HOST` antes.
+- Se o `docker` nativo não estiver instalado no WSL, o Makefile usa `docker.exe` automaticamente; mantenha o Docker Desktop com acesso à rede habilitado.
+- Teste a conexão com `docker.exe -H tcp://192.168.0.113:2375 ps` (deve listar os containers remotos).
+- Porta 2375 é sem TLS; mantenha a máquina na mesma rede confiável ou configure TLS/SSH se expor para fora.
+- Para evitar bind mounts inválidos no host remoto, use `make dev-up-remote` (combina `docker-compose.dev.yml` + `docker-compose.remote.yml`, sem volumes locais).
+- No Windows/WSL sem Docker Desktop: foi instalado o cliente Docker em `~/.local/bin/docker` + plugin Compose em `~/.docker/cli-plugins/docker-compose`. O Makefile prioriza esse binário com `DOCKER_HOST=tcp://192.168.0.113:2375`, então basta usar `make dev-up-remote`/`dev-down`/etc. sem precisar do Docker Desktop local.
+
 ## Webhook n8n
 
 Configure `N8N_WEBHOOK_URL`. Payload enviado:
